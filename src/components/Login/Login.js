@@ -1,24 +1,40 @@
+
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useSignInWithEmailAndPassword} from 'react-firebase-hooks/auth'
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import auth from '../../firebabe.int'
 import './Login.css'
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [
+        signInWithEmailAndPassword,
+        user,
+        loading,
+        error,
+    ] = useSignInWithEmailAndPassword(auth);
+    
+    const navigate = useNavigate();
+    const location = useLocation();
+    const from = location.state?.from?.pathname || '/';
 
-
-    const handleEmailBlur = event =>{
+    const handleEmailBlur = event => {
         setEmail(event.target.value);
     }
 
-    const handlePasswordBlur = event =>{
+    const handlePasswordBlur = event => {
         setPassword(event.target.value);
     }
 
-    const handleUserSignIn = event =>{
-        event.perventDefault();
+    if (user) {
+        navigate(from, {replace: true});
     }
 
+    const handleUserSignIn = event => {
+        event.preventDefault();
+        signInWithEmailAndPassword(email, password);
+    }
 
     return (
         <div className='form-container'>
@@ -33,6 +49,7 @@ const Login = () => {
                 <label htmlFor="password">Password</label>
                 <input onBlur={handlePasswordBlur} type="password" name="password" id="" required/>
             </div>
+            <p style={{color:'red '}}>{error?.message}</p>
             <input className='from-submit' type="submit" value="Login" />
             </form>
             <p>
